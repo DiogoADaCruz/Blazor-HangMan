@@ -1,0 +1,109 @@
+@page "/hangman"
+
+<div class="col">
+    <div class="row">
+    <h1>hangman</h1>
+    </div>
+
+    <div class="row">
+        <span>@attempts attempts</span>
+        <span class="space">|</span>
+        <span>@wrong wrong</span>
+        <span class="space">|</span>
+        @if(won) 
+        {
+            <span>You figured it out!</span>
+        }
+    </div>
+
+    <hr/>
+
+    <div class="row">
+        <div class="col-3 p-5">
+            <div class="row">
+                <h6>Guessed Letters</h6>
+            </div>
+            <div class="row">
+            @foreach (var guessedLetter in guessed)
+            {
+                <span class="guess-letter">@guessedLetter</span>
+            }
+            </div>
+        </div>
+
+        <div class="col-5">
+
+            <div class="row">
+                @foreach(var letter in word)
+                {
+                    @if(letter != ' ')
+                    {
+                        <span class="letter-to-guess @((correct[letter] ? "": "hide"))">@letter</span>
+                    }
+                    else
+                    {
+                        <span class="space"></span>
+                    }
+                }
+            </div>
+            
+            <br/>
+            
+            <div class="row">
+                @foreach(var letter in alphabet) {
+                    <button class="letter" disabled="@(Guessed(letter))" onclick="@(() => GuessLetter(letter))">@letter</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    char[] word;
+    Dictionary<char, bool> correct;
+    char[] guessed;
+    int attempts;
+    int wrong;
+    bool won = false;
+
+    char[] alphabet = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
+
+    protected override async Task OnInitAsync()
+    {
+        this.SetWord("testing blazor in web assembley");
+    }
+
+    void SetWord(string word) {
+        this.attempts = 0;
+        this.wrong = 0;
+        this.word = word.ToCharArray();
+        this.correct = new Dictionary<char, bool>();
+        foreach(var letter in word) {
+            if(letter != ' ' && !this.correct.ContainsKey(letter))
+                this.correct.Add(letter, false);
+        }
+        this.guessed = new char[alphabet.Length + 1];
+    }
+
+    bool Guessed(char letter) {
+        return this.guessed.Contains(letter);
+    }
+
+    void GuessLetter(char letter) {
+        if(this.Guessed(letter))
+            return;
+
+        this.attempts++;
+        this.guessed[this.attempts] = letter;
+        bool wasCorrect = false;
+        if(this.correct.ContainsKey(letter))
+        {
+            wasCorrect = true;
+            this.correct[letter] = true;
+        }
+        if(!wasCorrect)
+            this.wrong++;
+        
+        won = this.correct.Values.ToList().All(c => c);
+    }
+}
