@@ -1,6 +1,8 @@
 # Blazor-HangMan
 
-Hangman created in Web Assembly using .NET Blazor 
+Hangman created for fun in Web Assembly using .NET Blazor 
+
+Created to test out Blazor and web assembly. Future updates = maybe. :/
 
 # How To Use
 After pulling run 
